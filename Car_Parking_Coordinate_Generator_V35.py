@@ -1,7 +1,6 @@
 import json
 import cv2
 import numpy as np
-import pyperclip  # Asegúrate de tener instalada esta biblioteca
 from src.utils_V2 import Coordinate_denoter
 
 class Coordinate_denoter:
@@ -82,21 +81,23 @@ class CoordinateManipulator:
             "save": "Guardar"
         }, start_x=10, start_y=60)
 
-        self.texts = [
-            "",
-            "Haga clic en un rectángulo para seleccionarlo.",
+        self.texts = ["",
+            "Instrucciones de uso:",
+            "Haga clic en un rectangulo para seleccionarlo.",
             "Funciones de los botones:",
             "Rote, elimine, modifique, agregue y guarde posiciones.",
             "Teclas:",
-            "R -> Rotar",
-            "D -> Eliminar",
-            "A -> Agregar",
-            "S -> Guardar",
-            "+ -> Aumentar",
-            "- -> Disminuir",
-            "C -> Cambiar cámara",
-            "Tab -> Ingresar URL",
-            "Q -> Salir"
+            "- Presiona 'R' para rotar el rectangulo seleccionado",
+            "- Presiona 'D' para eliminar el rectangulo seleccionado",
+            "- Presiona 'A' para agregar un nuevo rectangulo.",
+            "- Presiona 'S' para guardar las posiciones",
+            "- Presiona '+' para aumentar el tamaño del rectangulo",
+            "- Presiona '-' para disminuir el tamaño del rectangulo",
+            "- Presiona 'c' para cambiar de camara",
+            "- Presiona 'Tab' para ingresar una URL de camara",
+            "- Presiona 'Enter' para conectar a la camara",
+            "- Presiona 'Esc' para salir de la ventana de la URL",
+            "- Presiona 'q' para cerrar la camara"
         ]
 
         self.cameras = self.get_available_cameras()
@@ -104,7 +105,7 @@ class CoordinateManipulator:
         self.cap = cv2.VideoCapture(self.cameras[self.current_camera_index])
 
         if not self.cap.isOpened():
-            raise ValueError("No se pudo acceder a la cámara.")
+            raise ValueError("No se pudo acceder a la camara.")
 
         self.scroll_buttons = {}
 
@@ -127,7 +128,7 @@ class CoordinateManipulator:
                 available_cameras.append(i)
                 cap.release()
         if not available_cameras:
-            raise ValueError("No se encontraron cámaras disponibles.")
+            raise ValueError("No se encontraron camaras disponibles.")
         return available_cameras
 
     def switch_camera(self):
@@ -135,7 +136,7 @@ class CoordinateManipulator:
         self.current_camera_index = (self.current_camera_index + 1) % len(self.cameras)
         self.cap = cv2.VideoCapture(self.cameras[self.current_camera_index])
         if not self.cap.isOpened():
-            print(f"No se pudo abrir la cámara {self.cameras[self.current_camera_index]}.")
+            print(f"No se pudo abrir la camara {self.cameras[self.current_camera_index]}.")
 
     def draw_text(self, image, text, position, font_scale=0.6, color=(255, 255, 255), thickness=2):
         x, y = position
@@ -278,10 +279,6 @@ class CoordinateManipulator:
             else:
                 self.dragging = False
 
-        elif event == cv2.EVENT_RBUTTONDOWN:  # Manejo del clic derecho
-            if self.selected_rect is None:  # Solo permite pegar si no hay selección
-                self.camera_url += pyperclip.paste()  # Pegar texto del portapapeles
-
     def rotate_selected_rectangle(self):
         if self.selected_rect is not None:
             self.rotation_angles[self.selected_rect] += 3
@@ -323,7 +320,7 @@ class CoordinateManipulator:
         cv2.resizeWindow("Input URL", 400, 200)
 
         # Mostrar instrucciones
-        cv2.putText(url_window, "Ingrese URL de la cámara:", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+        cv2.putText(url_window, "Ingrese URL de la camara:", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
         cv2.putText(url_window, self.camera_url, (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
 
         while True:
@@ -339,6 +336,7 @@ class CoordinateManipulator:
                 self.cap = cv2.VideoCapture(self.camera_url)
                 cv2.destroyWindow("Input URL")  # Cerrar la ventana de entrada
                 self.show_camera_status()  # Mostrar el estado de la cámara
+
                 return  # Salir de la función
 
             elif key == 8:  # Backspace
@@ -348,7 +346,7 @@ class CoordinateManipulator:
 
             # Actualizar la visualización de la URL
             url_window[:] = (0, 0, 0)  # Limpiar la ventana
-            cv2.putText(url_window, "Ingrese URL de la cámara:", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+            cv2.putText(url_window, "Ingrese URL de la camara:", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
             cv2.putText(url_window, self.camera_url, (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
 
         cv2.destroyWindow("Input URL")
@@ -358,7 +356,7 @@ class CoordinateManipulator:
         cv2.namedWindow("Camera Status", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Camera Status", 400, 200)
 
-        message = "Cámara conectada" if self.cap.isOpened() else "Cámara no encontrada"
+        message = "Camara conectada" if self.cap.isOpened() else "Camara no encontrada"
         color = (0, 255, 0) if self.cap.isOpened() else (0, 0, 255)  # Verde o Rojo
 
         cv2.putText(status_window, message, (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 1)
@@ -391,7 +389,7 @@ class CoordinateManipulator:
         while True:
             ret, image = self.cap.read()
             if not ret:
-                print("Error al leer el fotograma de la cámara.")
+                print("Error al leer el fotograma de la camara.")
                 break
 
             self.draw_rectangles(image)
@@ -425,6 +423,7 @@ class CoordinateManipulator:
 
         self.cap.release()
         cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     manipulator = CoordinateManipulator()
